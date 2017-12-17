@@ -1,6 +1,13 @@
 # ModularCounterProgram
 This is a rebuilt and redesigned program I made to use while watching Twitch Streams.
 
+# How To Use
+Download the Repository.
+
+Navigate to Debug/Release Folder.
+
+Run ModularCounterProgram.exe
+
 # Details
 The basic use of this program is you are able to add multiple counters and fill out different values for the counter itself.
 You can change the Max Value, The Label, and the Id of each individual counter when you add it.
