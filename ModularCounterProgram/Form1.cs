@@ -27,6 +27,7 @@ namespace ModularCounterProgram
         private int _counterTop;
         private int _numberOfCounters;
         private string _path;
+        private string _screenString = "0";
 
         private double _currentVersion = 2.1;
         private double _oldVersion = 1.5;
@@ -50,6 +51,17 @@ namespace ModularCounterProgram
 
             _cumulativeToolTip.AutoPopDelay = 0;
 
+            if (Screen.AllScreens.Length > 1)
+            {
+                var screens = new List<int>();
+
+                for (var i = 0; i < Screen.AllScreens.Length; i++)
+                {
+                    screens.Add(i);
+                }
+
+                InputBox("Change Selected Screen", "Choose Screen Number (" + string.Join(",", screens) + ")" , ref _screenString);
+            }
 
             AddMenuItems();
         }
@@ -70,6 +82,11 @@ namespace ModularCounterProgram
             AddNewOptionItem("addNewCounter", "Add New Counter", true, "options");
             AddNewOptionItem("showHideExcess", "Show/Hide Excess Area", true, "options");
             AddNewOptionItem("recreateCounters", "Recreate Counters", false, "");
+
+            if (Screen.AllScreens.Length > 1)
+            {
+                AddNewOptionItem("changeScreen", "Change Selected Screen", true, "options");
+            }
 
             AddItemToMenuStrip("options");
             Controls.Add(_mainMenu);
@@ -237,6 +254,7 @@ namespace ModularCounterProgram
             _mainMenu.BackColor = Color.Black;
             _optionItems[index].ForeColor = Color.White;
             TopMost = true;
+            PlaceUpperRight();
         }
 
         private void ShowExcess()
@@ -265,6 +283,7 @@ namespace ModularCounterProgram
             _mainMenu.BackColor = Color.White;
             _optionItems[index].ForeColor = Color.Black;
             TopMost = false;
+            PlaceUpperRight();
         }
 
         private void RecreateCounters()
@@ -330,6 +349,18 @@ namespace ModularCounterProgram
             {
                 RecreateCounters();
             }
+            if (clickedItem.Name == "changeScreen")
+            {
+                var screens = new List<int>();
+
+                for (var i = 0; i < Screen.AllScreens.Length; i++)
+                {
+                    screens.Add(i);
+                }
+
+                InputBox("Change Selected Screen", "Choose Screen Number (" + string.Join(",", screens) + ")", ref _screenString);
+                PlaceUpperRight();
+            }
         }
 
         private void CounterValueChanged(object sender, EventArgs e)
@@ -356,14 +387,14 @@ namespace ModularCounterProgram
 
         private void CheckBoxHover(object sender, EventArgs e)
         {
-            var itemHovered = (CheckBox) sender;
+            var itemHovered = (CheckBox)sender;
             _cumulativeToolTip.GetToolTip(itemHovered);
             _cumulativeToolTip.Active = true;
         }
 
         private void DisableCounterButtonClick(object sender, EventArgs e)
         {
-            var clickedItem = (Button) sender;
+            var clickedItem = (Button)sender;
             var index = _disableCounterList.IndexOf(clickedItem);
 
             if (_counterList[index].Enabled)
@@ -380,7 +411,7 @@ namespace ModularCounterProgram
 
         private void CumulativeModeChanged(object sender, EventArgs e)
         {
-            var clickedItem = (CheckBox) sender;
+            var clickedItem = (CheckBox)sender;
             var index = _enableCumulativeModeList.IndexOf(clickedItem);
 
             _cumulativeModeList[index] = !_cumulativeModeList[index];
@@ -697,10 +728,18 @@ namespace ModularCounterProgram
 
             if (_counterList.Count > 0)
             {
-                width = _counterList.Select((t, i) => t.Width + _labelList[i].Width + calculatedWidth).Concat(new[] {width}).Max();
+                width = _counterList.Select((t, i) => t.Width + _labelList[i].Width + calculatedWidth).Concat(new[] { width }).Max();
             }
 
             return width;
+        }
+
+        private void PlaceUpperRight()
+        {
+            var screen = Screen.AllScreens[int.Parse(_screenString)];
+
+            Left = screen.WorkingArea.Right - Width;
+            Top = screen.WorkingArea.Top;
         }
 
         private static DialogResult InputBox(string title, string promptText, ref string value)
